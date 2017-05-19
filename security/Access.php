@@ -97,13 +97,18 @@ class Access extends \lithium\core\Adaptable {
 				'params' => isset($params->params) ? $params->params : array()
 			);
 		}
-		$filter = function($self, $params) use ($name) {
-			return $self::adapter($name)->check(
+
+		$params = compact('user', 'params', 'options');
+
+		foreach ((array) $config['filters'] as $additionalFilter) {
+			Filters::apply(get_called_class(), __FUNCTION__, $additionalFilter);
+		}
+
+		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($name) {
+			return self::adapter($name)->check(
 				$params['user'], $params['params'], $params['options']
 			);
-		};
-		$params = compact('user', 'params', 'options');
-		return static::_filter(__FUNCTION__, $params, $filter, (array) $config['filters']);
+		});
 	}
 }
 
