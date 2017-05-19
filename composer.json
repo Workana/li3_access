@@ -1,5 +1,5 @@
 {
-        "name": "tmaiaroto/li3_access",
+        "name": "cfrutos/li3_access",
         "type": "lithium-library",
         "description": "A simple library for user access control.",
         "keywords": ["lithium", "access control", "li3_access"],

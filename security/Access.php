@@ -10,6 +10,7 @@
 namespace li3_access\security;
 
 use lithium\core\ConfigException;
+use lithium\aop\Filters;
 
 /**
  * The `Access` class provides...
