@@ -6,7 +6,7 @@ use lithium\security\Auth;
 use lithium\util\Inflector;
 use lithium\core\ConfigException;
 
-class AuthRbac extends \lithium\core\Object {
+class AuthRbac extends \lithium\core\ObjectDeprecated {
 
 	/**
 	 * @var array $_autoConfig
