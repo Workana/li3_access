@@ -102,7 +102,7 @@ class Access extends \lithium\core\Adaptable {
 
         $params = compact('user', 'params', 'options');
 
-        foreach ((array) $config['filters'] as $additionalFilter) {
+        foreach ((array) $config['filters'] ?? [] as $additionalFilter) {
             Filters::apply(get_called_class(), __FUNCTION__, $additionalFilter);
         }
 
