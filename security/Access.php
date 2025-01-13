@@ -24,92 +24,93 @@ use lithium\aop\Filters;
  */
 class Access extends \lithium\core\Adaptable {
 
-	/**
-	 * Stores configurations for various authentication adapters.
-	 *
-	 * @var object `Collection` of authentication configurations.
-	 */
-	protected static $_configurations = array();
-	/**
-	 * Libraries::locate() compatible path to adapters for this class.
-	 *
-	 * @see lithium\core\Libraries::locate()
-	 * @var string Dot-delimited path.
-	 */
-	protected static $_adapters = 'adapter.security.access';
+    /**
+     * Stores configurations for various authentication adapters.
+     *
+     * @var object `Collection` of authentication configurations.
+     */
+    protected static $_configurations = array();
+    /**
+     * Libraries::locate() compatible path to adapters for this class.
+     *
+     * @see lithium\core\Libraries::locate()
+     * @var string Dot-delimited path.
+     */
+    protected static $_adapters = 'adapter.security.access';
 
-	/**
-	 * Dynamic class dependencies.
-	 *
-	 * @var array Associative array of class names & their namespaces.
-	 */
-	protected static $_classes = array(
-	);
+    /**
+     * Dynamic class dependencies.
+     *
+     * @var array Associative array of class names & their namespaces.
+     */
+    protected static $_classes = array(
+    );
 
-	/**
-	 * Called when an adapter configuration is first accessed, this method sets the default
-	 * configuration for session handling. While each configuration can use its own session class
-	 * and options, this method initializes them to the default dependencies written into the class.
-	 * For the session key name, the default value is set to the name of the configuration.
-	 *
-	 * @param string $name The name of the adapter configuration being accessed.
-	 * @param array $config The user-specified configuration.
-	 * @return array Returns an array that merges the user-specified configuration with the
-	 *         generated default values.
-	 */
-	protected static function _initConfig($name, $config) {
-		$defaults = array();
-		$config = parent::_initConfig($name, $config) + $defaults;
-		return $config;
-	}
+    /**
+     * Called when an adapter configuration is first accessed, this method sets the default
+     * configuration for session handling. While each configuration can use its own session class
+     * and options, this method initializes them to the default dependencies written into the class.
+     * For the session key name, the default value is set to the name of the configuration.
+     *
+     * @param string $name The name of the adapter configuration being accessed.
+     * @param array $config The user-specified configuration.
+     * @return array Returns an array that merges the user-specified configuration with the
+     *         generated default values.
+     */
+    protected static function _initConfig($name, $config) {
+        $defaults = array();
+        $config = parent::_initConfig($name, $config) + $defaults;
+        return $config;
+    }
 
-	/**
-	 * Performs an access check against the specified configuration, and returns true
-	 * if access is permitted and an array with additional details if access is denied.
-	 *
-	 * The data return when access is not permitted will vary by adapter, but it is
-	 * ideal to have a "message" and a "redirect" so that a user can be notified
-	 * about why they were denied access and so they can be redirected somewhere to,
-	 * perhaps, login.
-	 *
-	 * @param string $name The name of the `Access` configuration/adapter to check against.
-	 * @param mixed $user The user data array that holds all necessary information about
-	 *        the user requesting access. Or `false` (because `Auth::check()` can return `false`).
-	 * @param mixed $params The Lithium `Request` object, or an array with at least
-	 *        'request', and 'params'
-	 * @param array $options An array of additional options.
-	 * @return Array An empty array if access is allowed and an array with reasons for denial
-	 *         if denied.
-	 */
-	public static function check($name, $user, $params, array $options = array()) {
-		$defaults = array(
-			'message' => 'You are not permitted to access this area.',
-			'redirect' => '/'
-		);
-		$options += $defaults;
+    /**
+     * Performs an access check against the specified configuration, and returns true
+     * if access is permitted and an array with additional details if access is denied.
+     *
+     * The data return when access is not permitted will vary by adapter, but it is
+     * ideal to have a "message" and a "redirect" so that a user can be notified
+     * about why they were denied access and so they can be redirected somewhere to,
+     * perhaps, login.
+     *
+     * @param string $name The name of the `Access` configuration/adapter to check against.
+     * @param mixed $user The user data array that holds all necessary information about
+     *        the user requesting access. Or `false` (because `Auth::check()` can return `false`).
+     * @param mixed $params The Lithium `Request` object, or an array with at least
+     *        'request', and 'params'
+     * @param array $options An array of additional options.
+     * @return array An empty array if access is allowed and an array with reasons for denial
+     *         if denied.
+     */
+    public static function check($name, $user, $params, array $options = array()) {
+        $defaults = [
+            'message' => 'You are not permitted to access this area.',
+            'redirect' => '/'
+        ];
 
-		if (($config = static::_config($name)) === null) {
-			throw new ConfigException("Configuration `{$name}` has not been defined.");
-		}
-		if (!is_array($params)) {
-			$params = array(
-				'request' => $params,
-				'params' => isset($params->params) ? $params->params : array()
-			);
-		}
+        $options += $defaults;
 
-		$params = compact('user', 'params', 'options');
+        if (($config = static::_config($name)) === null) {
+            throw new ConfigException("Configuration `{$name}` has not been defined.");
+        }
 
-		foreach ((array) $config['filters'] as $additionalFilter) {
-			Filters::apply(get_called_class(), __FUNCTION__, $additionalFilter);
-		}
+        if (!is_array($params)) {
+            $params = array(
+                'request' => $params,
+                'params' => isset($params->params) ? $params->params : array()
+            );
+        }
 
-		return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($name) {
-			return self::adapter($name)->check(
-				$params['user'], $params['params'], $params['options']
-			);
-		});
-	}
+        $params = compact('user', 'params', 'options');
+
+        foreach ((array) $config['filters'] as $additionalFilter) {
+            Filters::apply(get_called_class(), __FUNCTION__, $additionalFilter);
+        }
+
+        return Filters::run(get_called_class(), __FUNCTION__, $params, function($params) use ($name) {
+            return self::adapter($name)->check(
+                $params['user'], $params['params'], $params['options']
+            );
+        });
+    }
 }
 
-?>

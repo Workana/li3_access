@@ -22,9 +22,15 @@
                 {
                         "name": "rich97",
                         "homepage": "http://www.enrich.it/"
-                } 
+                }
         ],
         "require": {
-                "composer/installers": "*"
+                "composer/installers": "*",
+                "php": ">=8.0"
+        },
+        "config": {
+                "allow-plugins": {
+                        "composer/installers": true
+                }
         }
 }
